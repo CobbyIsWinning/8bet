@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
 import { fetchMatchDetails } from "@/lib/api/games";
 import { useBetSlip } from "@/contexts/BetSlipContext";
 import { useFavorites } from "@/contexts/FavoritesContext";
-import { getH2HOdds, getScore, getStatusColor, getStatusLabel } from "@/lib/utils";
+import { getScore, getStatusColor, getStatusLabel } from "@/lib/utils";
 
 export default function MatchDetailsPage() {
   const params = useParams();
@@ -18,6 +19,7 @@ export default function MatchDetailsPage() {
   const [match, setMatch] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedMarketKey, setSelectedMarketKey] = useState("all");
 
   useEffect(() => {
     (async () => {
@@ -108,21 +110,15 @@ export default function MatchDetailsPage() {
   const oddsMarkets = useMemo(() => normalizeOddsMarkets(match), [match]);
 
   const availableMarkets = useMemo(() => {
-    const list: any[] = [];
-    if (match?.markets?.h2h?.length > 0) list.push({ key: "h2h", label: "Match Result" });
-    if (match?.markets?.totals?.length > 0) list.push({ key: "totals", label: "Over/Under" });
-    if (match?.markets?.spreads?.length > 0) list.push({ key: "spreads", label: "Handicap" });
-    oddsMarkets.forEach((market: any) => {
-      if (market.items?.length && market.label !== "Asian Handicap") {
-        list.push({ key: market.key, label: market.label });
-      }
-    });
-    return list;
-  }, [match, oddsMarkets]);
+    const list = oddsMarkets
+      .filter((market: any) => market.items?.length > 0)
+      .map((market: any) => ({ key: market.key, label: market.label }));
+    return [{ key: "all", label: "All" }, ...list];
+  }, [oddsMarkets]);
 
   const toggleBet = (odd: any, marketType: string) => {
     const betId = `${match._id}_${odd._id}`;
-    const existing = bets.find((b) => b.matchId === match._id && b.marketType === marketType && b.selection === odd.name);
+    const existing = bets.find((b) => b.id === betId);
     if (existing) {
       removeBet(existing.id);
     } else {
@@ -157,108 +153,110 @@ export default function MatchDetailsPage() {
   }
 
   const score = getScore(match);
-  const h2hOdds = getH2HOdds(match);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="text-sm text-muted">Match Details</div>
-          <h1 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>{match.eventName || `${match.homeTeam} vs ${match.awayTeam}`}</h1>
-          <div className="text-sm text-muted">{match.league?.title}</div>
-        </div>
-        <Button
-          variant={isFavorite(match._id) ? "primary" : "outline"}
-          onClick={() => (isFavorite(match._id) ? removeFavorite(match._id) : addFavorite(match._id))}
-        >
-          {isFavorite(match._id) ? "Favorited" : "Favorite"}
-        </Button>
-      </div>
-
-      {match.status && match.status !== "scheduled" && (
-        <div className="rounded-full border px-3 py-1 text-xs font-semibold" style={{ borderColor: getStatusColor(match.status), color: getStatusColor(match.status) }}>
-          {getStatusLabel(match.status)}
-        </div>
-      )}
-
-      <div className="surface-card rounded-2xl p-6">
-        <div className="grid gap-6 md:grid-cols-3">
-          <div>
-            <div className="text-xs text-muted">Home</div>
-            <div className="text-lg font-semibold">{match.homeTeam}</div>
+    <div className="space-y-4">
+      <div className="surface-card rounded-2xl p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex w-1/3 flex-col items-center text-center">
+            {match.homeTeamRef?.logo && (
+              <Image src={match.homeTeamRef.logo} alt={match.homeTeam} width={48} height={48} className="h-12 w-12 object-contain" />
+            )}
+            <span className="mt-2 text-sm font-semibold">{match.homeTeam}</span>
           </div>
-          <div className="flex items-center justify-center">
-            <div className="rounded-xl border border-[color:var(--line)] bg-[color:var(--surface-2)] px-4 py-2 text-sm font-semibold">
+          <div className="text-center">
+            <div className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)" }}>
               {score ? `${score.home} - ${score.away}` : "VS"}
             </div>
+            {match.status && (
+              <div className="mt-1 text-xs font-semibold" style={{ color: getStatusColor(match.status) }}>
+                {getStatusLabel(match.status)}
+              </div>
+            )}
           </div>
-          <div className="text-right">
-            <div className="text-xs text-muted">Away</div>
-            <div className="text-lg font-semibold">{match.awayTeam}</div>
+          <div className="flex w-1/3 flex-col items-center text-center">
+            {match.awayTeamRef?.logo && (
+              <Image src={match.awayTeamRef.logo} alt={match.awayTeam} width={48} height={48} className="h-12 w-12 object-contain" />
+            )}
+            <span className="mt-2 text-sm font-semibold">{match.awayTeam}</span>
+          </div>
+        </div>
+        <div className="mt-4 flex items-center justify-between border-t border-[color:var(--line)] pt-4">
+          <div className="text-xs text-muted">{match.league?.title}</div>
+          <Button
+            variant={isFavorite(match._id) ? "primary" : "outline"}
+            size="sm"
+            onClick={() => (isFavorite(match._id) ? removeFavorite(match._id) : addFavorite(match._id))}
+          >
+            {isFavorite(match._id) ? "Favorited" : "Favorite"}
+          </Button>
+        </div>
+      </div>
+
+      <div className="sticky top-[65px] z-20 bg-[color:var(--background)]">
+        <div className="overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="flex space-x-2 border-b border-[color:var(--line)]">
+            {availableMarkets.map((market) => (
+              <button
+                key={market.key}
+                onClick={() => setSelectedMarketKey(market.key)}
+                className={`whitespace-nowrap px-4 py-3 text-sm font-semibold transition-colors ${
+                  selectedMarketKey === market.key
+                    ? "border-b-2 border-accent text-accent"
+                    : "text-muted hover:text-white"
+                }`}
+              >
+                {market.label}
+              </button>
+            ))}
           </div>
         </div>
       </div>
 
-      <div className="space-y-6">
-        {h2hOdds && (
-          <div className="surface-card rounded-2xl p-6">
-            <h2 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)" }}>Match Result (1X2)</h2>
-            <div className="mt-4 grid gap-2 sm:grid-cols-3">
-              {[
-                h2hOdds.home,
-                h2hOdds.draw,
-                h2hOdds.away,
-              ].map((odd: any, idx: number) => (
-                <button
-                  key={idx}
-                  onClick={() => odd && toggleBet(odd, "h2h")}
-                  className="rounded-xl border border-[color:var(--line)] bg-[color:var(--surface-2)] px-4 py-3 text-sm font-semibold"
-                >
-                  {odd?.price?.toFixed?.(2) ?? "--"}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+      <div className="space-y-4">
+        {oddsMarkets
+          .filter((market: any) => selectedMarketKey === "all" || selectedMarketKey === market.key)
+          .map((market: any) => {
+            const isOverUnder = market.label === "Goals Over/Under";
+            const gridClasses = () => {
+              if (isOverUnder) return "grid-cols-2";
+              if (market.items.length === 2) return "grid-cols-2";
+              if (market.items.length === 3) return "grid-cols-3";
+              return "grid-cols-2 md:grid-cols-3";
+            };
 
-        {match.markets?.totals && (
-          <div className="surface-card rounded-2xl p-6">
-            <h2 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)" }}>Over/Under Goals</h2>
-            <div className="mt-4 space-y-2">
-              {match.markets.totals.map((odd: any) => (
-                <button
-                  key={odd._id}
-                  onClick={() => toggleBet(odd, "totals")}
-                  className="flex w-full items-center justify-between rounded-xl border border-[color:var(--line)] bg-[color:var(--surface-2)] px-4 py-3 text-sm"
-                >
-                  <span>{odd.name} {odd.point !== null ? `(${odd.point})` : ""}</span>
-                  <span className="font-semibold">{odd.price?.toFixed?.(2) ?? "--"}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+            return (
+              <div key={market.key} className="surface-card rounded-2xl p-4">
+                <h2 className="text-md font-semibold" style={{ fontFamily: "var(--font-display)" }}>
+                  {market.label}
+                </h2>
+                <div className={`mt-2 grid gap-2 ${gridClasses()}`}>
+                  {market.items.map((odd: any) => (
+                    <button
+                      key={odd._id}
+                      onClick={() => toggleBet(odd, market.key)}
+                      className={`flex h-full rounded-lg border p-2 text-xs transition-colors ${
+                        isOverUnder
+                          ? "items-center justify-between px-4"
+                          : "flex-col items-center justify-center text-center"
+                      } ${
+                        bets.some((b) => b.id === `${match._id}_${odd._id}`)
+                          ? "border-accent bg-accent text-black"
+                          : "border-[color:var(--line)] bg-[color:var(--surface-2)] hover:bg-[color:var(--surface-3)]"
+                      }`}
+                    >
+                      <span className={isOverUnder ? "" : "text-muted"}>{odd.name}</span>
+                      <span className="text-sm font-bold">{odd.price?.toFixed?.(2) ?? "--"}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
 
-        {oddsMarkets.map((market: any) => (
-          <div key={market.key} className="surface-card rounded-2xl p-6">
-            <h2 className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)" }}>{market.label}</h2>
-            <div className="mt-4 grid gap-2 sm:grid-cols-3">
-              {market.items.map((odd: any) => (
-                <button
-                  key={odd._id}
-                  onClick={() => toggleBet(odd, market.key)}
-                  className="rounded-xl border border-[color:var(--line)] bg-[color:var(--surface-2)] px-4 py-3 text-sm font-semibold"
-                >
-                  {odd.name}: {odd.price?.toFixed?.(2) ?? "--"}
-                </button>
-              ))}
-            </div>
-          </div>
-        ))}
-
-        {availableMarkets.length === 0 && (
-          <div className="rounded-2xl border border-[color:var(--line)] bg-[color:var(--surface-2)] p-6 text-sm text-muted">
-            No markets available for this match.
+        {availableMarkets.length <= 1 && !loading && (
+          <div className="rounded-2xl border border-[color:var(--line)] bg-[color:var(--surface-2)] p-6 text-center text-sm text-muted">
+            No markets available for this match yet.
           </div>
         )}
       </div>

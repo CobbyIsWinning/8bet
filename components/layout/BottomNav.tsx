@@ -20,17 +20,17 @@ export default function BottomNav() {
       <div className="grid grid-cols-4 gap-2 px-2 py-2">
         {items.map((item) => {
           const Icon = item.icon;
-          const active = pathname === item.href;
+          const active = pathname === item.href || (item.href !== "/home" && pathname?.startsWith(item.href));
           return (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                "flex flex-col items-center gap-1 rounded-xl px-2 py-2 text-xs",
-                active ? "bg-(--accent)] text-[#171717]" : "text-muted"
+                "flex flex-col items-center justify-center gap-1 rounded-xl py-2 text-xs font-medium transition-colors",
+                active ? "bg-(--accent) text-[#171717]" : "text-muted hover:bg-(--surface-2)"
               )}
             >
-              <Icon size={18} />
+              <Icon size={20} strokeWidth={active ? 2.5 : 2} />
               {item.label}
             </Link>
           );
