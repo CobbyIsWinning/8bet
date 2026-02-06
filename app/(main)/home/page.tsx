@@ -319,7 +319,7 @@ export default function HomePage() {
               className="mb-3 flex cursor-pointer items-center justify-between border-l-4 border-(--accent) pl-3 py-1 transition-colors hover:bg-(--surface-2)/50"
             >
               <div className="flex items-center gap-2">
-                {group.league?.logo && (
+                {group.league?.logo && group.league.logo.startsWith("http") && (
                   <Image src={group.league.logo} alt={group.league.title} width={20} height={20} className="h-5 w-5 object-contain" />
                 )}
                 <div>

@@ -154,13 +154,19 @@ export default function MatchDetailsPage() {
 
   const score = getScore(match);
 
+  const getInitials = (name: string) => name?.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
+
   return (
     <div className="space-y-4">
       <div className="surface-card rounded-2xl p-4">
         <div className="flex items-center justify-between">
           <div className="flex w-1/3 flex-col items-center text-center">
-            {match.homeTeamRef?.logo && (
+            {match.homeTeamRef?.logo && match.homeTeamRef.logo.startsWith("http") ? (
               <Image src={match.homeTeamRef.logo} alt={match.homeTeam} width={48} height={48} className="h-12 w-12 object-contain" />
+            ) : (
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-(--surface-2) text-xs font-bold text-muted">
+                {getInitials(match.homeTeam)}
+              </div>
             )}
             <span className="mt-2 text-sm font-semibold">{match.homeTeam}</span>
           </div>
@@ -175,14 +181,27 @@ export default function MatchDetailsPage() {
             )}
           </div>
           <div className="flex w-1/3 flex-col items-center text-center">
-            {match.awayTeamRef?.logo && (
+            {match.awayTeamRef?.logo && match.awayTeamRef.logo.startsWith("http") ? (
               <Image src={match.awayTeamRef.logo} alt={match.awayTeam} width={48} height={48} className="h-12 w-12 object-contain" />
+            ) : (
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-(--surface-2) text-xs font-bold text-muted">
+                {getInitials(match.awayTeam)}
+              </div>
             )}
             <span className="mt-2 text-sm font-semibold">{match.awayTeam}</span>
           </div>
         </div>
         <div className="mt-4 flex items-center justify-between border-t border-(--line) pt-4">
-          <div className="text-xs text-muted">{match.league?.title}</div>
+          <div className="flex items-center gap-2">
+            {match.league?.logo && match.league.logo.startsWith("http") ? (
+              <Image src={match.league.logo} alt={match.league.title} width={20} height={20} className="h-5 w-5 object-contain" />
+            ) : (
+              <div className="flex h-5 w-5 items-center justify-center rounded-full bg-(--surface-2) text-[10px] font-bold text-muted">
+                {getInitials(match.league?.title)}
+              </div>
+            )}
+            <div className="text-xs text-muted">{match.league?.title}</div>
+          </div>
           <Button
             variant={isFavorite(match._id) ? "primary" : "outline"}
             size="sm"
