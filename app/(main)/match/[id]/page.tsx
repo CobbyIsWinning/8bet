@@ -138,7 +138,7 @@ export default function MatchDetailsPage() {
   };
 
   if (loading) {
-    return <div className="rounded-2xl border border-[color:var(--line)] bg-[color:var(--surface-2)] p-6 text-sm text-muted">Loading match...</div>;
+    return <div className="rounded-2xl border border-(--line) bg-(--surface-2) p-6 text-sm text-muted">Loading match...</div>;
   }
 
   if (error || !match) {
@@ -181,7 +181,7 @@ export default function MatchDetailsPage() {
             <span className="mt-2 text-sm font-semibold">{match.awayTeam}</span>
           </div>
         </div>
-        <div className="mt-4 flex items-center justify-between border-t border-[color:var(--line)] pt-4">
+        <div className="mt-4 flex items-center justify-between border-t border-(--line) pt-4">
           <div className="text-xs text-muted">{match.league?.title}</div>
           <Button
             variant={isFavorite(match._id) ? "primary" : "outline"}
@@ -193,9 +193,9 @@ export default function MatchDetailsPage() {
         </div>
       </div>
 
-      <div className="sticky top-[65px] z-20 bg-[color:var(--background)]">
+      <div className="sticky top-16.25 z-20 bg-(--background)">
         <div className="overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <div className="flex space-x-2 border-b border-[color:var(--line)]">
+          <div className="flex space-x-2 border-b border-(--line)">
             {availableMarkets.map((market) => (
               <button
                 key={market.key}
@@ -242,7 +242,7 @@ export default function MatchDetailsPage() {
                       } ${
                         bets.some((b) => b.id === `${match._id}_${odd._id}`)
                           ? "border-accent bg-accent text-black"
-                          : "border-[color:var(--line)] bg-[color:var(--surface-2)] hover:bg-[color:var(--surface-3)]"
+                          : "border-(--line) bg-(--surface-2) hover:bg-(--surface-3)"
                       }`}
                     >
                       <span className={isOverUnder ? "" : "text-muted"}>{odd.name}</span>
@@ -255,7 +255,7 @@ export default function MatchDetailsPage() {
           })}
 
         {availableMarkets.length <= 1 && !loading && (
-          <div className="rounded-2xl border border-[color:var(--line)] bg-[color:var(--surface-2)] p-6 text-center text-sm text-muted">
+          <div className="rounded-2xl border border-(--line) bg-(--surface-2) p-6 text-center text-sm text-muted">
             No markets available for this match yet.
           </div>
         )}

@@ -14,6 +14,8 @@ export default function MatchCard({ match }: { match: any }) {
   const h2hOdds = getH2HOdds(match);
   const score = getScore(match);
   const totalMarkets = countMarkets(match);
+  type H2HKey = "home" | "draw" | "away";
+  const h2hKeys: H2HKey[] = ["home", "draw", "away"];
 
   const toggleBet = (odd: any) => {
     if (!odd) return;
@@ -48,7 +50,7 @@ export default function MatchCard({ match }: { match: any }) {
         </div>
         <button
           onClick={() => (favorited ? removeFavorite(match._id) : addFavorite(match._id))}
-          className="text-[color:var(--accent)]"
+          className="text-accent"
           aria-label="Toggle favorite"
         >
           {favorited ? <Star size={18} /> : <StarOff size={18} />}
@@ -73,7 +75,7 @@ export default function MatchCard({ match }: { match: any }) {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {["home", "draw", "away"].map((key) => {
+          {h2hKeys.map((key) => {
             const odd = h2hOdds?.[key];
             const active = odd && bets.some((b) => b.id === `${match._id}_${odd._id}`);
             return (
@@ -82,8 +84,8 @@ export default function MatchCard({ match }: { match: any }) {
                 onClick={() => odd && toggleBet(odd)}
                 className={cn(
                   "rounded-xl border px-3 py-2 text-sm font-semibold",
-                  odd ? "border-[color:var(--line)]" : "border-dashed border-[color:var(--line)] opacity-60",
-                  active && "bg-[color:var(--accent)] text-[#171717]"
+                  odd ? "border-(--line)" : "border-dashed border-(--line) opacity-60",
+                  active && "bg-(--accent) text-[#171717]"
                 )}
               >
                 {odd ? odd.price?.toFixed?.(2) ?? "--" : "--"}
@@ -94,7 +96,7 @@ export default function MatchCard({ match }: { match: any }) {
       </div>
 
       <div className="mt-4 flex items-center justify-between text-xs text-muted">
-        <Link href={`/match/${match._id}`} className="text-[color:var(--accent)]">View Match</Link>
+        <Link href={`/match/${match._id}`} className="text-accent">View Match</Link>
         {totalMarkets > 0 && <span>{totalMarkets} markets</span>}
       </div>
     </div>

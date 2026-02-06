@@ -20,7 +20,7 @@ export default function TopBar() {
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 md:px-6">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-(--accent) text-[#171717] font-extrabold" style={{ fontFamily: "var(--font-display)" }}>
-            8
+            <img src="/icon.png" alt="the app icon" />
           </div>
           <div>
             <div className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)" }}>8BET</div>
