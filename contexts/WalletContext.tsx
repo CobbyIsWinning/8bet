@@ -29,6 +29,11 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         setBalance(response.data.balance || 0);
         setCurrency(response.data.currency || "GHS");
       }
+    } catch (error) {
+      // Keep last known balance on transient network failures.
+      if (process.env.NODE_ENV !== "production") {
+        console.warn("Wallet balance refresh failed:", error);
+      }
     } finally {
       setLoading(false);
     }

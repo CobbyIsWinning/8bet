@@ -69,7 +69,13 @@ export const extractMatches = (response: any): Match[] => {
   return [];
 };
 
-export const getH2HOdds = (match: any) => {
+type H2HOddsResult = {
+  home?: any;
+  draw?: any;
+  away?: any;
+} | null;
+
+export const getH2HOdds = (match: any): H2HOddsResult => {
   if (match?.markets?.h2h?.length) {
     const h2h = match.markets.h2h;
     const selections = h2h.map((odd: any, index: number) => {
