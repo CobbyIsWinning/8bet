@@ -25,8 +25,6 @@ interface AuthContextValue {
     phone?: string;
     email?: string;
     dob?: string;
-    idType?: string;
-    idNumber?: string;
     password: string;
   }) => Promise<void>;
   logout: () => Promise<void>;
@@ -96,8 +94,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     phone?: string;
     email?: string;
     dob?: string;
-    idType?: string;
-    idNumber?: string;
     password: string;
   }) => {
     setLoading(true);

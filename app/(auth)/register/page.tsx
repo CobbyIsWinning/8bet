@@ -14,8 +14,6 @@ export default function RegisterPage() {
     phone: "",
     email: "",
     dob: "",
-    idType: "",
-    idNumber: "",
     password: "",
   });
   const [loading, setLoading] = useState(false);
@@ -34,8 +32,6 @@ export default function RegisterPage() {
         phone: form.phone || undefined,
         email: form.email || undefined,
         dob: form.dob || undefined,
-        idType: form.idType || undefined,
-        idNumber: form.idNumber || undefined,
         password: form.password,
       });
       router.push("/home");
@@ -71,14 +67,6 @@ export default function RegisterPage() {
             <label className="text-sm text-muted">Date of Birth</label>
             <Input type="date" value={form.dob} onChange={(e) => handleChange("dob", e.target.value)} />
           </div>
-          <div>
-            <label className="text-sm text-muted">ID Type</label>
-            <Input value={form.idType} onChange={(e) => handleChange("idType", e.target.value)} placeholder="Ghana Card" />
-          </div>
-        </div>
-        <div>
-          <label className="text-sm text-muted">ID Number</label>
-          <Input value={form.idNumber} onChange={(e) => handleChange("idNumber", e.target.value)} placeholder="ID123456" />
         </div>
         <div>
           <label className="text-sm text-muted">Password</label>

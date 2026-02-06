@@ -1,20 +1,16 @@
 import apiClient from "@/lib/apiClient";
 import { ENDPOINTS } from "@/lib/endpoints";
 
-export const register = async ({ phone, email, dob, idType, idNumber, password }: {
+export const register = async ({ phone, email, dob, password }: {
   phone?: string;
   email?: string;
   dob?: string;
-  idType?: string;
-  idNumber?: string;
   password: string;
 }) => {
   const response = await apiClient.post(ENDPOINTS.AUTH.REGISTER, {
     phone,
     email,
     dob,
-    idType,
-    idNumber,
     password,
   });
   return response.data;
