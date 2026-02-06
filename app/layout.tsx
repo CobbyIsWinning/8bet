@@ -16,6 +16,7 @@ const manrope = Manrope({
 export const metadata: Metadata = {
   title: "8BET",
   description: "8BET Sportsbook Web",
+  icons: "/icon.png"
 };
 
 export default function RootLayout({
