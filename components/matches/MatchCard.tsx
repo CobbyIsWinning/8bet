@@ -17,6 +17,9 @@ export default function MatchCard({ match }: { match: any }) {
 
   const getInitials = (name: string) => name?.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
 
+  const homeLogo = match.homeTeamRef?.logo || (match.homeTeamId ? `https://media.api-sports.io/football/teams/${match.homeTeamId}.png` : null);
+  const awayLogo = match.awayTeamRef?.logo || (match.awayTeamId ? `https://media.api-sports.io/football/teams/${match.awayTeamId}.png` : null);
+
   const toggleBet = (e: React.MouseEvent, odd: any) => {
     e.stopPropagation();
     if (!odd) return;
@@ -58,8 +61,8 @@ export default function MatchCard({ match }: { match: any }) {
           <div className="flex flex-col gap-1">
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 overflow-hidden">
-                {match.homeTeamRef?.logo && match.homeTeamRef.logo.startsWith("http") ? (
-                  <Image src={match.homeTeamRef.logo} alt={match.homeTeam} width={16} height={16} className="h-4 w-4 object-contain" />
+                {homeLogo && homeLogo.startsWith("http") ? (
+                  <Image src={homeLogo} alt={match.homeTeam} width={16} height={16} className="h-4 w-4 object-contain" />
                 ) : (
                   <div className="flex h-4 w-4 items-center justify-center rounded-full bg-(--surface-2) text-[8px] font-bold text-muted">
                     {getInitials(match.homeTeam)}
@@ -71,8 +74,8 @@ export default function MatchCard({ match }: { match: any }) {
             </div>
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 overflow-hidden">
-                {match.awayTeamRef?.logo && match.awayTeamRef.logo.startsWith("http") ? (
-                  <Image src={match.awayTeamRef.logo} alt={match.awayTeam} width={16} height={16} className="h-4 w-4 object-contain" />
+                {awayLogo && awayLogo.startsWith("http") ? (
+                  <Image src={awayLogo} alt={match.awayTeam} width={16} height={16} className="h-4 w-4 object-contain" />
                 ) : (
                   <div className="flex h-4 w-4 items-center justify-center rounded-full bg-(--surface-2) text-[8px] font-bold text-muted">
                     {getInitials(match.awayTeam)}
