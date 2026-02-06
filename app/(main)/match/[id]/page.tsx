@@ -202,7 +202,7 @@ export default function MatchDetailsPage() {
                 onClick={() => setSelectedMarketKey(market.key)}
                 className={`whitespace-nowrap px-4 py-3 text-sm font-semibold transition-colors ${
                   selectedMarketKey === market.key
-                    ? "border-b-2 border-accent text-accent"
+                    ? "border-b-2 border-(--accent) text-(--accent)"
                     : "text-muted hover:text-white"
                 }`}
               >
@@ -218,8 +218,71 @@ export default function MatchDetailsPage() {
           .filter((market: any) => selectedMarketKey === "all" || selectedMarketKey === market.key)
           .map((market: any) => {
             const isOverUnder = market.label === "Goals Over/Under";
+
+            if (isOverUnder) {
+              const points: Record<string, { over?: any; under?: any }> = {};
+              market.items.forEach((item: any) => {
+                if (!points[item.point]) points[item.point] = {};
+                if (item.name.toLowerCase().includes("over")) points[item.point].over = item;
+                if (item.name.toLowerCase().includes("under")) points[item.point].under = item;
+              });
+
+              return (
+                <div key={market.key} className="surface-card rounded-2xl p-4">
+                  <h2 className="text-md font-semibold" style={{ fontFamily: "var(--font-display)" }}>
+                    {market.label}
+                  </h2>
+                  <div className="mt-2">
+                    <div className="grid grid-cols-[3.5rem_1fr_1fr] gap-2 mb-2 text-xs text-muted font-semibold text-center">
+                      <div></div>
+                      <div>Over</div>
+                      <div>Under</div>
+                    </div>
+                    <div className="space-y-2">
+                      {Object.entries(points)
+                        .sort((a, b) => parseFloat(a[0]) - parseFloat(b[0]))
+                        .map(([point, odds]) => (
+                          <div key={point} className="grid grid-cols-[3.5rem_1fr_1fr] gap-2 h-10">
+                            <div className="flex items-center justify-center rounded-lg bg-(--surface-3) text-sm font-bold text-muted">
+                              {point}
+                            </div>
+                            {odds.over ? (
+                              <button
+                                onClick={() => toggleBet(odds.over, market.key)}
+                                className={`flex items-center justify-center rounded-lg border text-sm font-bold transition-colors ${
+                                  bets.some((b) => b.id === `${match._id}_${odds.over._id}`)
+                                    ? "border-(--accent) bg-(--accent) text-[#171717]"
+                                    : "border-(--line) bg-(--surface-2) hover:bg-(--surface-3)"
+                                }`}
+                              >
+                                {odds.over.price?.toFixed?.(2) ?? "--"}
+                              </button>
+                            ) : (
+                              <div />
+                            )}
+                            {odds.under ? (
+                              <button
+                                onClick={() => toggleBet(odds.under, market.key)}
+                                className={`flex items-center justify-center rounded-lg border text-sm font-bold transition-colors ${
+                                  bets.some((b) => b.id === `${match._id}_${odds.under._id}`)
+                                    ? "border-(--accent) bg-(--accent) text-[#171717]"
+                                    : "border-(--line) bg-(--surface-2) hover:bg-(--surface-3)"
+                                }`}
+                              >
+                                {odds.under.price?.toFixed?.(2) ?? "--"}
+                              </button>
+                            ) : (
+                              <div />
+                            )}
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
             const gridClasses = () => {
-              if (isOverUnder) return "grid-cols-2";
               if (market.items.length === 2) return "grid-cols-2";
               if (market.items.length === 3) return "grid-cols-3";
               return "grid-cols-2 md:grid-cols-3";
@@ -236,16 +299,14 @@ export default function MatchDetailsPage() {
                       key={odd._id}
                       onClick={() => toggleBet(odd, market.key)}
                       className={`flex h-full rounded-lg border p-2 text-xs transition-colors ${
-                        isOverUnder
-                          ? "items-center justify-between px-4"
-                          : "flex-col items-center justify-center text-center"
+                        "flex-col items-center justify-center text-center"
                       } ${
                         bets.some((b) => b.id === `${match._id}_${odd._id}`)
-                          ? "border-accent bg-accent text-black"
+                          ? "border-(--accent) bg-(--accent) text-[#171717]"
                           : "border-(--line) bg-(--surface-2) hover:bg-(--surface-3)"
                       }`}
                     >
-                      <span className={isOverUnder ? "" : "text-muted"}>{odd.name}</span>
+                      <span className="text-muted">{odd.name}</span>
                       <span className="text-sm font-bold">{odd.price?.toFixed?.(2) ?? "--"}</span>
                     </button>
                   ))}

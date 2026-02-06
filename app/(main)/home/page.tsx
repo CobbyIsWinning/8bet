@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
+import { ChevronDown } from "lucide-react";
 import socketService from "@/lib/socket";
 import SearchBar from "@/components/common/SearchBar";
 import FilterModal, { Filters } from "@/components/common/FilterModal";
@@ -26,6 +28,7 @@ export default function HomePage() {
   const { isFavorite } = useFavorites();
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const [collapsedLeagues, setCollapsedLeagues] = useState<Set<string>>(new Set());
 
   const pageSize = 20;
 
@@ -198,6 +201,34 @@ export default function HomePage() {
     return result;
   }, [matches, quickAction, isFavorite]);
 
+  const groupedMatches = useMemo(() => {
+    const groups: { league: any; matches: any[] }[] = [];
+    const leagueMap = new Map<string, number>();
+
+    filteredMatches.forEach((match) => {
+      const leagueId = match.league?._id || "other";
+      if (!leagueMap.has(leagueId)) {
+        leagueMap.set(leagueId, groups.length);
+        groups.push({
+          league: match.league,
+          matches: [],
+        });
+      }
+      groups[leagueMap.get(leagueId)!].matches.push(match);
+    });
+
+    return groups;
+  }, [filteredMatches]);
+
+  const toggleLeague = (id: string) => {
+    setCollapsedLeagues((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -280,9 +311,52 @@ export default function HomePage() {
         </div>
       )}
 
-      <div className="grid gap-4">
-        {filteredMatches.map((match) => (
-          <MatchCard key={match._id} match={match} />
+      <div className="space-y-6">
+        {groupedMatches.map((group) => (
+          <div key={group.league?._id || "other"} className="rounded-2xl bg-(--surface-2)/20 p-2 overflow-hidden">
+            <div
+              onClick={() => toggleLeague(group.league?._id || "other")}
+              className="mb-3 flex cursor-pointer items-center justify-between border-l-4 border-(--accent) pl-3 py-1 transition-colors hover:bg-(--surface-2)/50"
+            >
+              <div className="flex items-center gap-2">
+                {group.league?.logo && (
+                  <Image src={group.league.logo} alt={group.league.title} width={20} height={20} className="h-5 w-5 object-contain" />
+                )}
+                <div>
+                  {group.league?.country?.name && (
+                    <div className="text-xs font-bold text-muted uppercase tracking-wider">
+                      {group.league.country.name}
+                    </div>
+                  )}
+                  <div className="text-sm font-bold text-foreground">{group.league?.title || "Other Matches"}</div>
+                </div>
+              </div>
+              <ChevronDown className={`mr-2 h-5 w-5 text-muted transition-transform ${collapsedLeagues.has(group.league?._id || "other") ? "-rotate-90" : ""}`} />
+            </div>
+            {!collapsedLeagues.has(group.league?._id || "other") && (
+              <div className="grid gap-2">
+              {group.matches.map((match, index) => {
+                const isNewDate =
+                  index === 0 ||
+                  new Date(match.matchTime).toDateString() !== new Date(group.matches[index - 1].matchTime).toDateString();
+                return (
+                  <React.Fragment key={match._id}>
+                    {isNewDate && match.status !== "in_play" && (
+                      <div className="mt-2 mb-1 px-1 text-xs font-bold text-muted/80 uppercase">
+                        {new Date(match.matchTime).toLocaleDateString(undefined, {
+                          weekday: "long",
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </div>
+                    )}
+                    <MatchCard match={match} />
+                  </React.Fragment>
+                );
+              })}
+              </div>
+            )}
+          </div>
         ))}
       </div>
 
