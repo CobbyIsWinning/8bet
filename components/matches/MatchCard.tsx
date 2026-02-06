@@ -12,6 +12,8 @@ export default function MatchCard({ match }: { match: any }) {
   const { addBet, removeBet, bets } = useBetSlip();
   const h2hOdds = getH2HOdds(match);
   const score = getScore(match);
+  type H2HKey = "home" | "draw" | "away";
+  const h2hKeys: H2HKey[] = ["home", "draw", "away"];
 
   const getInitials = (name: string) => name?.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
 
@@ -84,7 +86,7 @@ export default function MatchCard({ match }: { match: any }) {
         </div>
 
         <div className="flex items-center gap-1">
-          {["home", "draw", "away"].map((key) => {
+          {h2hKeys.map((key) => {
             const odd = h2hOdds?.[key];
             const active = odd && bets.some((b) => b.id === `${match._id}_${odd._id}`);
             return (

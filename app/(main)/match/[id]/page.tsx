@@ -221,7 +221,7 @@ export default function MatchDetailsPage() {
                 onClick={() => setSelectedMarketKey(market.key)}
                 className={`whitespace-nowrap px-4 py-3 text-sm font-semibold transition-colors ${
                   selectedMarketKey === market.key
-                    ? "border-b-2 border-(--accent) text-(--accent)"
+                    ? "border-b-2 border-(--accent) text-accent"
                     : "text-muted hover:text-white"
                 }`}
               >
