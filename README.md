@@ -16,7 +16,7 @@ bun dev
 
 ### Port configuration
 
-Set `PORT` in `.env.local` to change which port Next.js uses.
+Set `PORT` in `.env.local` to change which port Next.js uses for both `npm run dev` and `npm start`.
 
 ```bash
 cp .env.local.example .env.local
