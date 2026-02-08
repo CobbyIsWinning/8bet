@@ -40,9 +40,9 @@ export default function MorePage() {
         </div>
 
         <div className="surface-card rounded-2xl p-6 space-y-3">
-          <Link href="/static/help" className="text-sm text-[color:var(--accent)]">Help & Support</Link>
-          <Link href="/static/terms" className="text-sm text-[color:var(--accent)]">Terms & Conditions</Link>
-          <Link href="/static/privacy" className="text-sm text-[color:var(--accent)]">Privacy Policy</Link>
+          <Link href="/static/help" className="text-sm text-accent">Help & Support</Link>
+          <Link href="/static/terms" className="text-sm text-accent">Terms & Conditions</Link>
+          <Link href="/static/privacy" className="text-sm text-accent">Privacy Policy</Link>
         </div>
       </div>
     );
@@ -76,11 +76,11 @@ export default function MorePage() {
       </div>
 
       <div className="surface-card rounded-2xl p-6 space-y-3">
-        <Link href="/profile" className="text-sm text-[color:var(--accent)]">Profile Settings</Link>
-        <Link href="/transactions" className="text-sm text-[color:var(--accent)]">Transactions</Link>
-        <Link href="/settings" className="text-sm text-[color:var(--accent)]">Settings</Link>
-        <Link href="/static/help" className="text-sm text-[color:var(--accent)]">Help & Support</Link>
-        <Link href="/static/terms" className="text-sm text-[color:var(--accent)]">Terms & Conditions</Link>
+        <Link href="/profile" className="text-sm text-accent">Profile Settings</Link>
+        <Link href="/transactions" className="text-sm text-accent">Transactions</Link>
+        <Link href="/settings" className="text-sm text-accent">Settings</Link>
+        <Link href="/static/help" className="text-sm text-accent">Help & Support</Link>
+        <Link href="/static/terms" className="text-sm text-accent">Terms & Conditions</Link>
       </div>
 
       <Button variant="outline" onClick={logout}>Log Out</Button>

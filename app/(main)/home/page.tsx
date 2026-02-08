@@ -295,7 +295,7 @@ export default function HomePage() {
       )}
 
       {loading && (
-        <div className="rounded-2xl border border-[color:var(--line)] bg-[color:var(--surface-2)] p-6">
+        <div className="rounded-2xl border border-(--line) bg-(--surface-2) p-6">
           <LoadingIndicator type="dot-circle" size="md" label="Loading matches..." />
         </div>
       )}
