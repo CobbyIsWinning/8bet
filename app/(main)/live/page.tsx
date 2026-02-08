@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import socketService from "@/lib/socket";
 import MatchCard from "@/components/matches/MatchCard";
+import { LoadingIndicator } from "@/components/application/loading-indicator/loading-indicator";
 import { fetchLiveMatches } from "@/lib/api/games";
 import { extractMatches } from "@/lib/utils";
 
@@ -67,8 +68,8 @@ export default function LivePage() {
       </div>
 
       {loading && (
-        <div className="rounded-2xl border border-[color:var(--line)] bg-[color:var(--surface-2)] p-6 text-sm text-muted">
-          Loading live matches...
+        <div className="rounded-2xl border border-[color:var(--line)] bg-[color:var(--surface-2)] p-6">
+          <LoadingIndicator type="dot-circle" size="md" label="Loading live matches..." />
         </div>
       )}
 

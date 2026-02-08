@@ -8,6 +8,7 @@ import SearchBar from "@/components/common/SearchBar";
 import FilterModal, { Filters } from "@/components/common/FilterModal";
 import MatchCard from "@/components/matches/MatchCard";
 import Button from "@/components/ui/Button";
+import { LoadingIndicator } from "@/components/application/loading-indicator/loading-indicator";
 import { fetchMatches, fetchSports } from "@/lib/api/games";
 import { extractMatches } from "@/lib/utils";
 import { useFavorites } from "@/contexts/FavoritesContext";
@@ -256,8 +257,8 @@ export default function HomePage() {
             onClick={() => setQuickAction(action.key as any)}
             className={`rounded-2xl border px-4 py-3 text-sm font-semibold ${
               quickAction === action.key
-                ? "bg-[color:var(--accent)] text-[#171717]"
-                : "border-[color:var(--line)] bg-[color:var(--surface-2)] text-muted"
+                ? "bg-(--accent) text-[#171717]"
+                : "border-(--line) bg-(--surface-2) text-muted"
             }`}
           >
             {action.label}
@@ -271,8 +272,8 @@ export default function HomePage() {
             onClick={() => setSelectedSport("all")}
             className={`rounded-full border px-4 py-2 text-xs font-semibold ${
               selectedSport === "all"
-                ? "bg-[color:var(--accent)] text-[#171717]"
-                : "border-[color:var(--line)] bg-[color:var(--surface-2)] text-muted"
+                ? "bg-(--accent) text-[#171717]"
+                : "border-(--line) bg-(--surface-2) text-muted"
             }`}
           >
             All
@@ -283,8 +284,8 @@ export default function HomePage() {
               onClick={() => setSelectedSport(sport._id)}
               className={`rounded-full border px-4 py-2 text-xs font-semibold ${
                 selectedSport === sport._id
-                  ? "bg-[color:var(--accent)] text-[#171717]"
-                  : "border-[color:var(--line)] bg-[color:var(--surface-2)] text-muted"
+                  ? "bg-(--accent) text-[#171717]"
+                  : "border-(--line) bg-(--surface-2) text-muted"
               }`}
             >
               {sport.name}
@@ -294,8 +295,8 @@ export default function HomePage() {
       )}
 
       {loading && (
-        <div className="rounded-2xl border border-[color:var(--line)] bg-[color:var(--surface-2)] p-6 text-sm text-muted">
-          Loading matches...
+        <div className="rounded-2xl border border-[color:var(--line)] bg-[color:var(--surface-2)] p-6">
+          <LoadingIndicator type="dot-circle" size="md" label="Loading matches..." />
         </div>
       )}
 
@@ -306,7 +307,7 @@ export default function HomePage() {
       )}
 
       {!loading && !error && filteredMatches.length === 0 && (
-        <div className="rounded-2xl border border-[color:var(--line)] bg-[color:var(--surface-2)] p-6 text-sm text-muted">
+        <div className="rounded-2xl border border-(--line) bg-(--surface-2) p-6 text-sm text-muted">
           No matches available.
         </div>
       )}
@@ -362,8 +363,8 @@ export default function HomePage() {
 
       <div ref={sentinelRef} />
       {loadingMore && (
-        <div className="flex justify-center text-sm text-muted">
-          Loading more...
+        <div className="flex justify-center">
+          <LoadingIndicator type="dot-circle" size="sm" label="Loading more..." />
         </div>
       )}
 

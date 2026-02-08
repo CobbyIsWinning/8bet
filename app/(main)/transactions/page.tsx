@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { fetchTransactions } from "@/lib/api/wallet";
 import Button from "@/components/ui/Button";
+import { LoadingIndicator } from "@/components/application/loading-indicator/loading-indicator";
 
 const formatDate = (date: string) => new Date(date).toLocaleString();
 
@@ -87,8 +88,8 @@ export default function TransactionsPage() {
       </div>
 
       {loading && (
-        <div className="rounded-2xl border border-[color:var(--line)] bg-[color:var(--surface-2)] p-6 text-sm text-muted">
-          Loading transactions...
+        <div className="rounded-2xl border border-[color:var(--line)] bg-[color:var(--surface-2)] p-6">
+          <LoadingIndicator type="dot-circle" size="md" label="Loading transactions..." />
         </div>
       )}
 

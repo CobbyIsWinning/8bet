@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
+import { LoadingIndicator } from "@/components/application/loading-indicator/loading-indicator";
 import { fetchMatchDetails } from "@/lib/api/games";
 import { useBetSlip } from "@/contexts/BetSlipContext";
 import { useFavorites } from "@/contexts/FavoritesContext";
@@ -46,6 +47,8 @@ export default function MatchDetailsPage() {
 
   const normalizeOddsMarkets = (matchData: any) => {
     if (!Array.isArray(matchData?.odds) || !matchData.odds.length) return [];
+    const getSelectionPrice = (selection: any) =>
+      selection?.odd ?? selection?.price ?? selection?.odds ?? selection?.value ?? null;
 
     return matchData.odds.map((market: any) => {
       if (market.type === "grouped" && Array.isArray(market.selections)) {
@@ -53,22 +56,24 @@ export default function MatchDetailsPage() {
         if (market.name === "Goals Over/Under") {
           market.selections.forEach((selection: any) => {
             if (selection?.over) {
+              const overPrice = getSelectionPrice(selection.over);
               items.push({
                 _id: buildOddsId(market, `over_${selection.point}`),
                 realOddId: market._id,
                 name: selection.over.label || `Over ${selection.point}`,
                 selectionLabel: selection.over.label || `Over ${selection.point}`,
-                price: selection.over.odd || selection.over.price,
+                price: overPrice,
                 point: selection.point,
               });
             }
             if (selection?.under) {
+              const underPrice = getSelectionPrice(selection.under);
               items.push({
                 _id: buildOddsId(market, `under_${selection.point}`),
                 realOddId: market._id,
                 name: selection.under.label || `Under ${selection.point}`,
                 selectionLabel: selection.under.label || `Under ${selection.point}`,
-                price: selection.under.odd || selection.under.price,
+                price: underPrice,
                 point: selection.point,
               });
             }
@@ -80,7 +85,7 @@ export default function MatchDetailsPage() {
               realOddId: market._id,
               name: selection.label || `Option ${index + 1}`,
               selectionLabel: selection.label,
-              price: selection.odd,
+              price: getSelectionPrice(selection),
               point: selection.point,
             });
           });
@@ -138,7 +143,11 @@ export default function MatchDetailsPage() {
   };
 
   if (loading) {
-    return <div className="rounded-2xl border border-(--line) bg-(--surface-2) p-6 text-sm text-muted">Loading match...</div>;
+    return (
+      <div className="rounded-2xl border border-(--line) bg-(--surface-2) p-6">
+        <LoadingIndicator type="dot-circle" size="md" label="Loading match..." />
+      </div>
+    );
   }
 
   if (error || !match) {

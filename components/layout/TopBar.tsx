@@ -8,12 +8,60 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useWallet } from "@/contexts/WalletContext";
 import { cn } from "@/lib/cn";
+import { useEffect, useState } from "react";
+import { fetchMyBets } from "@/lib/api/bets";
 
 export default function TopBar() {
   const pathname = usePathname();
   const { isAuthenticated, user, logout } = useAuth();
   const { mode, toggleTheme } = useTheme();
   const { balance } = useWallet();
+  const [pendingCount, setPendingCount] = useState(0);
+
+  const normalizeStatus = (value: any) => (value?.toLowerCase?.() || value);
+
+  const getBetStatus = (bet: any) => {
+    const status = normalizeStatus(bet?.status);
+    const result = normalizeStatus(bet?.result);
+    const selectionResults = (bet?.selections || []).map((s: any) => normalizeStatus(s?.result)).filter(Boolean);
+
+    if (["pending", "won", "lost", "void"].includes(status)) return status;
+    if (["pending", "won", "lost", "void"].includes(result)) return result;
+
+    if (selectionResults.includes("lost")) return "lost";
+    if (selectionResults.every((r: string) => r === "void")) return "void";
+    if (selectionResults.every((r: string) => r === "won" || r === "void")) return "won";
+    return "pending";
+  };
+
+  const refreshPendingCount = () => {
+    if (!isAuthenticated) {
+      setPendingCount(0);
+      return;
+    }
+    fetchMyBets({ limit: 50, skip: 0 })
+      .then((res) => {
+        const data = res?.data || res?.data?.data || [];
+        const count = data.filter((b: any) => getBetStatus(b) === "pending").length;
+        setPendingCount(count);
+      })
+      .catch(() => setPendingCount(0));
+  };
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setPendingCount(0);
+      return;
+    }
+    refreshPendingCount();
+
+    const handler = () => refreshPendingCount();
+    window.addEventListener("bets:updated", handler as EventListener);
+
+    return () => {
+      window.removeEventListener("bets:updated", handler as EventListener);
+    };
+  }, [isAuthenticated]);
 
   return (
     <header className="sticky top-0 z-30 w-full border-b border-(--line) bg-(--surface)">
@@ -23,8 +71,8 @@ export default function TopBar() {
             <img src="/icon.png" alt="the app icon" />
           </div>
           <div>
-            <div className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)" }}>8BET</div>
-            <div className="text-xs text-muted">Live Sportsbook</div>
+            <div className="text-lg font-semibold" style={{ fontFamily: "var(--font-display)" }}>8InfinityBET</div>
+            <div className="text-xs text-muted">Sportsbook</div>
           </div>
         </div>
 
@@ -61,7 +109,7 @@ export default function TopBar() {
           { href: "/home", label: "Home" },
           { href: "/live", label: "Live" },
           { href: "/bets", label: "My Bets" },
-          { href: "/more", label: "More" },
+          { href: "/more", label: "Account" },
         ].map((item) => (
           <Link
             key={item.href}
@@ -71,7 +119,14 @@ export default function TopBar() {
               pathname === item.href ? "bg-(--accent) text-[#171717]" : "text-muted hover:bg-(--surface-2)"
             )}
           >
-            {item.label}
+            <span className="relative inline-flex items-center gap-2">
+              {item.label}
+              {item.href === "/bets" && pendingCount > 0 && (
+                <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white">
+                  {pendingCount}
+                </span>
+              )}
+            </span>
           </Link>
         ))}
       </nav>

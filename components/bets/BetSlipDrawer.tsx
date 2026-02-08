@@ -75,6 +75,9 @@ export default function BetSlipDrawer({ open, onClose }: { open: boolean; onClos
 
       clearBetSlip();
       onClose();
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("bets:updated"));
+      }
     } catch (err: any) {
       setError(err?.response?.data?.message || err?.message || "Failed to place bet");
     } finally {
@@ -163,10 +166,12 @@ export default function BetSlipDrawer({ open, onClose }: { open: boolean; onClos
               <span className="text-sm font-semibold text-[color:var(--success)]">GH₵{getPotentialWinnings().toFixed(2)}</span>
             </div>
 
-            <Button onClick={handlePlaceBets} disabled={loading}>
-              {loading ? "Placing..." : `Place Bet${betType === "single" ? "s" : ""}`}
-            </Button>
-            <button onClick={clearBetSlip} className="text-sm text-muted">Clear All</button>
+            <div className="flex justify-end gap-3">
+              <button onClick={clearBetSlip} className="text-sm text-muted">Clear All</button>
+              <Button onClick={handlePlaceBets} disabled={loading}>
+                {loading ? "Placing..." : `Place Bet${betType === "single" ? "s" : ""}`}
+              </Button>
+            </div>
           </div>
         )}
       </div>
